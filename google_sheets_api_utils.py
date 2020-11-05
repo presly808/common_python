@@ -24,7 +24,7 @@ def is_sheet_empty(spreadsheet_id=SAMPLE_SPREADSHEET_ID):
 
 
 @error_wrapper
-def get_spreadsheet(sheet_id="18igl1KHH_w0K_snOoT494hpp8WtlIr3jt89QQgG7Z8"):
+def get_spreadsheet(sheet_id):
 
     creds = google_init_creds()
 
@@ -148,6 +148,30 @@ def find_positions_by_values(search_formulas, sample_spreadsheet_id=SAMPLE_SPREA
 
     # TODO: Change code below to process the `response` dict:
     return response
+
+
+def find_header_column_indexes(headers: [str], spreadsheet_id: str, sheet_name: str) -> [(str, int)]:
+    search_formulas = ['=MATCH("{search}"; {sheetName}!{colName}:{colName}; 0)'.format(
+        search=header_name, sheetName=sheet_name, colName='1') for header_name in headers]
+
+    response = find_positions_by_values(search_formulas, spreadsheet_id)
+
+    indexes = response['updatedData']['values'][0]
+
+    result = list(zip(headers, indexes))
+
+    return result
+
+
+def find_row_index(value, column_letter, spreadsheet_id: str, sheet_name: str) -> int:
+    search_formulas = ['=MATCH({search}; {sheetName}!{colName}:{colName}; 0)'.format(
+        search=value, sheetName=sheet_name, colName=column_letter)]
+
+    response = find_positions_by_values(search_formulas, spreadsheet_id)
+
+    index = response['updatedData']['values'][0][0]
+
+    return index
 
 
 def batch_update(entries_to_update, sample_spreadsheet_id=SAMPLE_SPREADSHEET_ID):
