@@ -1,12 +1,14 @@
 from peewee import *
 import datetime
 
+from playhouse.postgres_ext import PostgresqlExtDatabase
+
 from src.config import LOCAL_DB, REMOTE_DB_USER, REMOTE_DB_PASS, REMOTE_DB_NAME, REMOTE_DB_HOST, REMOTE_DB_PORT, \
     LOCAL_DB_PATH
 
 db = SqliteDatabase(LOCAL_DB_PATH) if LOCAL_DB \
-    else PostgresqlDatabase(database=REMOTE_DB_NAME, user=REMOTE_DB_USER,
-                            password=REMOTE_DB_PASS, host=REMOTE_DB_HOST, port=REMOTE_DB_PORT)
+    else PostgresqlExtDatabase(REMOTE_DB_NAME, user=REMOTE_DB_USER,
+                               password=REMOTE_DB_PASS, host=REMOTE_DB_HOST, port=REMOTE_DB_PORT)
 
 
 class BaseModel(Model):
@@ -51,6 +53,8 @@ class UserDB(BaseModel):
     status = CharField(null=True, unique=False)
     next_contact_period_days = IntegerField(null=True, unique=False)
     last_contact_date = DateTimeField(null=True)
+    sheet_id = CharField(null=True, unique=False)
+    sheet_name = CharField(null=True, unique=False)
     created_date = DateTimeField(default=datetime.datetime.now)
     email_verified_by_open = CharField(null=True, unique=False)
     email_verified_by_service = CharField(null=True, unique=False)
