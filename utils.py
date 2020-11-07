@@ -10,13 +10,12 @@ import datetime
 
 # import pandas as pd
 # import xlsxwriter
+from enum import Enum, auto
+
 from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
 
 from src.config import VERIMAIL_API_KEY, SCOPES, VERIMAIL_ENABLED
-
-LETTERS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-           'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
 
 
 def error_wrapper(func):
@@ -183,27 +182,6 @@ class GoogleContact:
         return ",".join([self.map[x] if self.map[x] is not None else '' for x in GoogleContact.HEADERS])
 
 
-def get_sheet_letter(column_num: int) -> str:
-    div = int(column_num / len(LETTERS))
-    mod = column_num % len(LETTERS)
-
-    if div == 0:
-        return LETTERS[column_num - 1]
-    else:
-        return LETTERS[div - 1] + LETTERS[mod - 1]
-
-
-def get_sheet_letter_complex(column_num: int) -> str:
-    res = ''
-    div = column_num
-    while div != 0:
-        mod = div % len(LETTERS)
-        div = int(div / len(LETTERS))
-        res = LETTERS[mod - 1] + res
-
-    return res
-
-
 # def to_str_list(obj):
 #     return [SheetContactRow.format_str(getattr(obj, name)) for name in SheetContactRow.get_field_names_ordered()]
 
@@ -243,3 +221,15 @@ def to_row(obj: object, clazz: type) -> [(str, object)]:
 
 def format_row(input_arg: {str: object}, headers: [str]) -> [str]:
     return [format_str(input_arg[header]) if header in input_arg else "" for header in headers]
+
+
+class UserStatus(Enum):
+    EMAIL_MUST_SENT_ = auto()
+    EMAIL_SENT = auto()
+    EMAIL_OPENED = auto()
+    EMAIL_RESPONDED = auto()
+    LINKED_SENT_INVITE = auto()
+    LINKED_SALES_SENT_MESSAGE = auto()
+    LINKED_CONFIRMED_FRIEND_REQUEST = auto()
+    PITCH_CALL = auto()
+

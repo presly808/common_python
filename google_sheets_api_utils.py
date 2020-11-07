@@ -4,6 +4,29 @@ from googleapiclient.discovery import build
 from src.config import SAMPLE_SPREADSHEET_ID, SHEET_HIDDEN_TO_SEARCH
 from common_python.utils import google_init_creds, error_wrapper
 
+LETTERS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+           'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+
+
+def get_sheet_letter(column_num: int) -> str:
+    div = int(column_num / len(LETTERS))
+    mod = column_num % len(LETTERS)
+
+    if div == 0:
+        return LETTERS[column_num - 1]
+    else:
+        return LETTERS[div - 1] + LETTERS[mod - 1]
+
+
+def get_sheet_letter_complex(column_num: int) -> str:
+    res = ''
+    div = column_num
+    while div != 0:
+        mod = div % len(LETTERS)
+        div = int(div / len(LETTERS))
+        res = LETTERS[mod - 1] + res
+
+    return res
 
 def is_sheet_empty(spreadsheet_id=SAMPLE_SPREADSHEET_ID):
     """Shows basic usage of the Sheets API.
@@ -211,7 +234,39 @@ def batch_update(entries_to_update, sample_spreadsheet_id=SAMPLE_SPREADSHEET_ID)
     return response
 
 
+class UpdateRowInfo:
+    def __init__(self, name, value):
+        self.name = name
+        self.value = value
+
+    def __eq__(self, o: object) -> bool:
+        return self.name == o.name
+
+
+def update_table_row(update_row_list: [UpdateRowInfo], sheet_name='Sheet1'):
+    find_headers_req = \
+        ['=MATCH("{search}"; {sheetName}!{colName}:{colName}; 0)'.format(search=row_info.name,
+                                                                         sheetName=sheet_name, colName=1)
+         for row_info in update_row_list]
+    r = find_positions_by_values(find_headers_req)
+    # keys = [item[0] for item in key_value_list]
+    row_index_tuple = list(zip(update_row_list, r['updatedData']['values'][0]))
+
+    for item in row_index_tuple:
+        item[0].header_letter = get_sheet_letter_complex(item[1])
+
+    id_row_info = next(filter(lambda row: row.name == 'UserDB_id', update_row_list))
+
+    update_row_list.remove(id_row_info)
+
+    row_num = find_positions_by_values(['=MATCH({search}; {sheetName}!{colName}:{colName}; 0)'.format(
+        search=id_row_info.value, sheetName=sheet_name, colName=id_row_info.header_letter)])[0][0]
+
+    update_res = batch_update(dict([(update_row.header_letter + str(row_num), update_row.value) for update_row in update_row_list]))
+
+    print(update_res['responses'][0]['updatedData']['values'][0][0])
+
+
 if __name__ == '__main__':
     # is_sheet_empty()
-    res = find_row_num_by_value()
-    print(res['updatedData']['values'][0][0])
+    print(find_row_num_by_value()['updatedData']['values'][0][0])
