@@ -204,12 +204,6 @@ def batch_update(entries_to_update, sample_spreadsheet_id=SAMPLE_SPREADSHEET_ID)
 
     spreadsheet_id = sample_spreadsheet_id  # TODO: Update placeholder value.
 
-    # The A1 notation of the values to update.
-    range_ = SHEET_HIDDEN_TO_SEARCH + '!A1'  # TODO: Update placeholder value.
-
-    # How the input data should be interpreted.
-    value_input_option = 'USER_ENTERED'  # TODO: Update placeholder value.
-
     data = []
     for rangeName, rangeValue in entries_to_update.items():
         data.append({
@@ -243,7 +237,7 @@ class UpdateRowInfo:
         return self.name == o.name
 
 
-def update_table_row(update_row_list: [UpdateRowInfo], sheet_name='Sheet1'):
+def update_table_row(update_row_list: [UpdateRowInfo], sheet_name):
     find_headers_req = \
         ['=MATCH("{search}"; {sheetName}!{colName}:{colName}; 0)'.format(search=row_info.name,
                                                                          sheetName=sheet_name, colName=1)
@@ -259,10 +253,12 @@ def update_table_row(update_row_list: [UpdateRowInfo], sheet_name='Sheet1'):
 
     update_row_list.remove(id_row_info)
 
-    row_num = find_positions_by_values(['=MATCH({search}; {sheetName}!{colName}:{colName}; 0)'.format(
-        search=id_row_info.value, sheetName=sheet_name, colName=id_row_info.header_letter)])[0][0]
+    r2 = find_positions_by_values(['=MATCH({search}; {sheetName}!{colName}:{colName}; 0)'.format(
+        search=id_row_info.value, sheetName=sheet_name, colName=id_row_info.header_letter)])
+    row_num = r2['updatedData']['values'][0][0]
 
-    update_res = batch_update(dict([(update_row.header_letter + str(row_num), update_row.value) for update_row in update_row_list]))
+    dict_to_update = dict([(update_row.header_letter + str(row_num), update_row.value) for update_row in update_row_list])
+    update_res = batch_update(dict_to_update)
 
     print(update_res['responses'][0]['updatedData']['values'][0][0])
 

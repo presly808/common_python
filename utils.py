@@ -206,7 +206,7 @@ def get_field_names_ordered(clazz):
         clazz.__dict__.keys()))
 
 
-def to_row(obj: object, clazz: type) -> [(str, object)]:
+def to_row(obj: object, clazz: type) -> {str, object}:
     result = {}
     table_name = obj.__class__.__name__
     for key, value in obj.__data__.items():
