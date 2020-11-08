@@ -224,7 +224,7 @@ def format_row(input_arg: {str: object}, headers: [str]) -> [str]:
 
 
 class UserStatus(Enum):
-    EMAIL_MUST_SENT_ = auto()
+    EMAIL_MUST_SENT = auto()
     EMAIL_SENT = auto()
     EMAIL_OPENED = auto()
     EMAIL_RESPONDED = auto()
