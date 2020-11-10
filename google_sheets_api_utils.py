@@ -75,7 +75,7 @@ def append_line(sheet_id, row):
 
 
 @error_wrapper
-def create_new_sheet(spreadsheet_id, new_sheet_name):
+def create_new_sheet(spreadsheet_id, new_sheet_name, hidden=False):
 
     creds = google_init_creds()
     request_body = {
@@ -83,7 +83,7 @@ def create_new_sheet(spreadsheet_id, new_sheet_name):
             'addSheet': {
                 'properties': {
                     'title': new_sheet_name,
-                    'hidden': True
+                    'hidden': hidden
                 }
             }
         }]
@@ -237,7 +237,7 @@ class UpdateRowInfo:
         return self.name == o.name
 
 
-def update_table_row(update_row_list: [UpdateRowInfo], sheet_name):
+def update_table_row(update_row_list: [UpdateRowInfo], sheet_name, id_name='UserDB_id'):
     find_headers_req = \
         ['=MATCH("{search}"; {sheetName}!{colName}:{colName}; 0)'.format(search=row_info.name,
                                                                          sheetName=sheet_name, colName=1)
@@ -249,7 +249,7 @@ def update_table_row(update_row_list: [UpdateRowInfo], sheet_name):
     for item in row_index_tuple:
         item[0].header_letter = get_sheet_letter_complex(item[1])
 
-    id_row_info = next(filter(lambda row: row.name == 'UserDB_id', update_row_list))
+    id_row_info = next(filter(lambda row: row.name == id_name, update_row_list))
 
     update_row_list.remove(id_row_info)
 

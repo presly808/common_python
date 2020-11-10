@@ -7,6 +7,7 @@ import pickle
 import traceback
 import uuid
 import datetime
+import urllib.parse
 
 # import pandas as pd
 # import xlsxwriter
@@ -15,7 +16,7 @@ from enum import Enum, auto
 from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
 
-from src.config import VERIMAIL_API_KEY, SCOPES, VERIMAIL_ENABLED
+from src.config import VERIMAIL_API_KEY, SCOPES
 
 
 def error_wrapper(func):
@@ -41,7 +42,8 @@ def exception_wrapper_with_default_value(func, default_value):
 
 def verify_email(email: str) -> dict:
     conn = http.client.HTTPSConnection("api.verimail.io")
-    url = '/v3/verify?email=' + email + '&key=' + VERIMAIL_API_KEY
+    email_encoded = urllib.parse.urlencode({'email': email})
+    url = '/v3/verify?' + email_encoded + '&key=' + VERIMAIL_API_KEY
     conn.request("GET", url)
     res = conn.getresponse()
     datajs = res.read()
@@ -105,8 +107,6 @@ def save_to_csv(headers, list_of_rows, file_name, ):
 
 # todo refactor
 def find_valid_email(emails: [str]) -> ([str], str):
-    if not VERIMAIL_ENABLED:
-        return emails, 'catch_all'
     for email in emails:
         res = exception_wrapper_with_default_value(lambda: verify_email(email), {'deliverable': False})
         if res['deliverable'] is True:

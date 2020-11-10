@@ -8,7 +8,7 @@ from src.config import LOCAL_DB, REMOTE_DB_USER, REMOTE_DB_PASS, REMOTE_DB_NAME,
 
 db = SqliteDatabase(LOCAL_DB_PATH) if LOCAL_DB \
     else PostgresqlExtDatabase(REMOTE_DB_NAME, user=REMOTE_DB_USER,
-                               password=REMOTE_DB_PASS, host=REMOTE_DB_HOST, port=REMOTE_DB_PORT)
+                               password=REMOTE_DB_PASS, host=REMOTE_DB_HOST, port=REMOTE_DB_PORT, autorollback=True)
 
 
 class BaseModel(Model):
@@ -19,7 +19,7 @@ class BaseModel(Model):
 class CompanyDB(BaseModel):
     name = CharField(null=True, unique=False)
     domain = CharField(null=True, unique=False)
-    site = CharField(null=True, unique=True)
+    site = CharField(null=True, unique=False)
     industry = CharField(null=True, unique=False)
     industry_code = CharField(null=True, unique=False)
     size = CharField(null=True, unique=False)
@@ -30,8 +30,8 @@ class CompanyDB(BaseModel):
     location = CharField(null=True, unique=False)
     search_url = CharField(null=True, unique=False)
     status = CharField(null=True, unique=False)
-    search_page_num = CharField(null=True, unique=False)
-    search_num_on_page = CharField(null=True, unique=False)
+    search_page_num = IntegerField(null=True, unique=False)
+    search_num_on_page = IntegerField(null=True, unique=False)
     country = CharField(null=True, unique=False)
     location_codes = CharField(null=True, unique=False)
     linkedin_id = CharField(null=True, unique=False)
@@ -63,7 +63,7 @@ class UserDB(BaseModel):
 
 
 class EmailContactDB(BaseModel):
-    email = CharField(unique=True)
+    email = CharField(null=True, unique=False)
     email_validated = BooleanField(null=True, unique=False)
     email_validation_type = CharField(null=True, unique=False)
     created_date = DateTimeField(default=datetime.datetime.now)
