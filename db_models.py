@@ -88,3 +88,4 @@ class MessageDB(BaseModel):
 
 db.connect()
 db.create_tables([UserDB, CompanyDB, EmailContactDB, MessageDB])
+db.close()
