@@ -1,7 +1,7 @@
 from __future__ import print_function
 from googleapiclient.discovery import build
 
-from src.config import SAMPLE_SPREADSHEET_ID, SHEET_HIDDEN_TO_SEARCH
+from src.config import SAMPLE_SPREADSHEET_ID, SHEET_HIDDEN_TO_SEARCH, SHEET_NAME
 from common_python.utils import google_init_creds, error_wrapper
 
 LETTERS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
@@ -28,7 +28,8 @@ def get_sheet_letter_complex(column_num: int) -> str:
 
     return res
 
-def is_sheet_empty(spreadsheet_id=SAMPLE_SPREADSHEET_ID):
+
+def is_sheet_empty(spreadsheet_id=SAMPLE_SPREADSHEET_ID, sheet_name=SHEET_NAME):
     """Shows basic usage of the Sheets API.
     Prints values from a sample spreadsheet.
     """
@@ -40,7 +41,7 @@ def is_sheet_empty(spreadsheet_id=SAMPLE_SPREADSHEET_ID):
     sheet = service.spreadsheets()
 
     result = sheet.values().get(spreadsheetId=spreadsheet_id,
-                                range='A1').execute()
+                                range=sheet_name + '!A1').execute()
     values = result.get('values', [])
 
     return not values
@@ -61,14 +62,14 @@ def get_spreadsheet(sheet_id):
 
 
 @error_wrapper
-def append_line(sheet_id, row):
+def append_line(sheet_id, row, sheet_name):
 
     creds = google_init_creds()
     service = build('sheets', 'v4', credentials=creds)
 
     # TODO add SheetName to range
     result = service.spreadsheets().values().append(
-        spreadsheetId=sheet_id, range='A1',
+        spreadsheetId=sheet_id, range=sheet_name + '!A1',
         valueInputOption='RAW', body={"values": [row]}).execute()
 
     return result
@@ -213,7 +214,7 @@ def batch_update(entries_to_update, sample_spreadsheet_id=SAMPLE_SPREADSHEET_ID)
 
     batch_update_values_request_body = {
         # How the input data should be interpreted.
-        'value_input_option': 'RAW',  # TODO: Update placeholder value.
+        'value_input_option': 'USER_ENTERED',  # TODO: Update placeholder value.
         'response_value_render_option': 'UNFORMATTED_VALUE',
         'include_values_in_response': True,
         # The new values to apply to the spreadsheet.

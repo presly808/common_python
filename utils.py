@@ -63,10 +63,15 @@ def verify_email_post(email: str) -> dict:
 
 def construct_emails(full_name: str, domain_name: str) -> [str]:
     parts = full_name.lower().split()
+    suffix = '@' + domain_name
+
+    if len(parts) < 2:
+        return [parts[0] + suffix]
+
     first_name = parts[0]
     last_name = parts[1]
-    suffix = '@' + domain_name
-    return [first_name + '.' + last_name + suffix,
+    return [last_name + suffix,
+            first_name + '.' + last_name + suffix,
             first_name[0] + '.' + last_name + suffix,
             first_name + '_' + last_name + suffix,
             first_name[0] + last_name + suffix]
@@ -114,7 +119,7 @@ def find_valid_email(emails: [str]) -> ([str], str):
                 return [email], 'deliverable'
             elif res['result'] == 'catch_all':
                 return emails, 'catch_all'
-    return [''], 'undeliverable'
+    return [], 'undeliverable'
 
 
 # def merging_all_xlsx_in_dir(path: str, final_name: str) -> None:
@@ -132,12 +137,12 @@ def format_date(obj: datetime) -> str:
     return obj.strftime("%d.%m.%Y %H:%M")
 
 
-def google_init_creds():
+def google_init_creds(token_pickle_path='/google_api_pickles/gmail/codetheart/serhii_bilobrov/token.pickle'):
     creds = None
     # The file token.pickle stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
     # time.
-    pickle_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/src/token.pickle'
+    pickle_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + token_pickle_path
     if os.path.exists(pickle_path):
         with open(pickle_path, 'rb') as token:
             creds = pickle.load(token)
@@ -229,9 +234,19 @@ class UserStatus(Enum):
     EMAIL_MUST_SENT = auto()
     EMAIL_SENT = auto()
     EMAIL_OPENED = auto()
+    EMAIL_OPENED_BUT_BLOCKED = auto()
+    EMAIL_SEND_ERROR = auto()
+    EMAIL_SEND_ERROR_ADDRESS_NOT_FOUND = auto()
+    EMAIL_SEND_ERROR_BLOCKED = auto()
+    EMAIL_SEND_ERROR_LIMIT = auto()
+    EMAIL_CHECKING_STATUS = auto()
+    EMAIL_SEND_ERROR_GENERAL = auto()
     EMAIL_RESPONDED = auto()
     LINKED_SENT_INVITE = auto()
     LINKED_SALES_SENT_MESSAGE = auto()
+    LINKED_SALES_OPENED_MESSAGE = auto()
+    LINKED_SALES_RESPONDED_ON_MESSAGE = auto()
+    UPCOMING_CALL = auto()
     LINKED_CONFIRMED_FRIEND_REQUEST = auto()
     PITCH_CALL = auto()
 
