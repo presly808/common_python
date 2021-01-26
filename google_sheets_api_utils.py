@@ -1,7 +1,7 @@
 from __future__ import print_function
 from googleapiclient.discovery import build
 
-from src.config import SAMPLE_SPREADSHEET_ID, SHEET_HIDDEN_TO_SEARCH, SHEET_NAME
+from src.config import SAMPLE_SPREADSHEET_ID, SHEET_HIDDEN_TO_SEARCH
 from common_python.utils import google_init_creds, error_wrapper
 
 LETTERS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
@@ -29,7 +29,7 @@ def get_sheet_letter_complex(column_num: int) -> str:
     return res
 
 
-def is_sheet_empty(spreadsheet_id=SAMPLE_SPREADSHEET_ID, sheet_name=SHEET_NAME):
+def is_sheet_empty(spreadsheet_id=SAMPLE_SPREADSHEET_ID, sheet_name=""):
     """Shows basic usage of the Sheets API.
     Prints values from a sample spreadsheet.
     """
