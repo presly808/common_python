@@ -16,7 +16,7 @@ from enum import Enum, auto
 from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
 
-from src.config import VERIMAIL_API_KEY, SCOPES
+from src.config import VERIMAIL_API_KEY, SCOPES, DEFAULT_TOKEN_PATH
 
 
 def error_wrapper(func):
@@ -137,7 +137,7 @@ def format_date(obj: datetime) -> str:
     return obj.strftime("%d.%m.%Y %H:%M")
 
 
-def google_init_creds(token_pickle_path='/google_api_pickles/gmail/codetheart/serhii_bilobrov/token.pickle'):
+def google_init_creds(token_pickle_path=DEFAULT_TOKEN_PATH):
     creds = None
     # The file token.pickle stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
